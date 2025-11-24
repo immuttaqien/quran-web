@@ -155,7 +155,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5">
               <a href="#">
                 <div className="size-5 rounded-full bg-foreground" />
-                <span className="font-semibold text-base">Acme Inc.</span>
+                <span className="font-semibold text-base">Quran Web</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

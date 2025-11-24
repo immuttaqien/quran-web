@@ -23,7 +23,7 @@ const geistMono = Geist_Mono({
 export async function generateMetadata(): Promise<Metadata> {
   const [{ data: whitelabel }] = await Promise.all([getWhitelabel()])
 
-  const name = whitelabel?.name || "SAI"
+  const name = whitelabel?.name || "Quran Web"
 
   return {
     title: {
