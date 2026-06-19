@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Quran Web
 
-## Getting Started
+Aplikasi web untuk membaca Al-Quran, dibangun dengan Next.js 15 dan TypeScript.
 
-First, run the development server:
+**Live Demo**: [quran-web-lac.vercel.app](https://quran-web-lac.vercel.app)
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router + Turbopack)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **UI Components**: shadcn/ui + Radix UI
+- **State Management**: TanStack Query v5
+- **Animasi**: Motion
+- **Linting/Formatting**: Biome
+- **Package Manager**: Bun
+- **Deployment**: Vercel
+
+## Fitur
+
+- Baca Al-Quran per surah
+- Autentikasi pengguna (login)
+- Dukungan whitelabel
+- Tampilan responsif
+
+## Struktur Proyek
+
+```
+src/
+├── actions/        # Server actions
+├── app/            # Halaman dan routing (Next.js App Router)
+│   ├── (app)/      # Halaman utama
+│   └── (auth)/     # Halaman autentikasi
+├── components/     # Komponen UI reusable
+├── data/           # Data statis
+├── features/       # Fitur modular (whitelabel, dll.)
+├── hooks/          # Custom React hooks
+├── lib/            # Utilitas dan helper
+└── types/          # TypeScript type definitions
+```
+
+## Instalasi
+
+Pastikan [Bun](https://bun.sh) sudah terinstall.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+# Clone repository
+git clone https://github.com/immuttaqien/quran-web.git
+cd quran-web
+
+# Install dependencies
+bun install
+
+# Salin file environment
+cp .env.example .env.local
+```
+
+## Development
+
+```bash
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka [http://localhost:3000](http://localhost:3000) di browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+bun build
+bun start
+```
 
-## Learn More
+## Docker
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+docker build -t quran-web .
+docker run -p 3000:3000 quran-web
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Script | Deskripsi |
+|--------|-----------|
+| `bun dev` | Jalankan development server |
+| `bun build` | Build untuk production |
+| `bun start` | Jalankan production server |
+| `bun lint` | Lint kode dengan Biome |
+| `bun clean` | Hapus build artifacts |
 
-## Deploy on Vercel
+## Lisensi
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[MIT](LICENSE)
