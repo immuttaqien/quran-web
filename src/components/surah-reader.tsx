@@ -39,16 +39,23 @@ export default function SurahReader({
               </p>
             </div>
 
-            <button
-              className={`px-4 py-2 rounded-full font-medium text-sm transition-all ${
-                showTranslations
-                  ? "bg-teal-100 text-teal-700 border border-teal-200"
-                  : "bg-teal-50 text-teal-600 border border-teal-100 hover:bg-teal-100"
-              }`}
-              onClick={() => setShowTranslations(!showTranslations)}
-              type="button">
-              {showTranslations ? "👁 Hide Known" : "👁 Peek All"}
-            </button>
+            <div className="flex items-center gap-2">
+              <Link
+                className="px-4 py-2 rounded-full font-medium text-sm bg-slate-800 text-white hover:bg-slate-900 transition-colors"
+                href={`/surah/${chapter.id}/quiz?page=${currentPage}`}>
+                Kuis halaman ini
+              </Link>
+              <button
+                className={`px-4 py-2 rounded-full font-medium text-sm transition-all ${
+                  showTranslations
+                    ? "bg-teal-100 text-teal-700 border border-teal-200"
+                    : "bg-teal-50 text-teal-600 border border-teal-100 hover:bg-teal-100"
+                }`}
+                onClick={() => setShowTranslations(!showTranslations)}
+                type="button">
+                {showTranslations ? "👁 Hide Known" : "👁 Peek All"}
+              </button>
+            </div>
           </div>
 
           <div className="w-full bg-slate-200 rounded-full h-2">

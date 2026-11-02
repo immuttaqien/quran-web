@@ -99,6 +99,15 @@ export function toggleKnownWord(key: string) {
   write([...keys])
 }
 
+/** Tandai sebuah kata sebagai dikenal (tidak membatalkan bila sudah ditandai). */
+export function markKnownWord(key: string) {
+  const keys = new Set(parseKnownKeys(getSnapshot()))
+  if (keys.has(key)) return
+
+  keys.add(key)
+  write([...keys])
+}
+
 export function clearKnownWords() {
   write([])
 }

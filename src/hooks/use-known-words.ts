@@ -6,6 +6,7 @@ import {
   countByChapter,
   getServerSnapshot,
   getSnapshot,
+  markKnownWord,
   parseKnownKeys,
   subscribe,
   toggleKnownWord,
@@ -24,6 +25,7 @@ export default function useKnownWords() {
     knownWords,
     countsByChapter,
     toggle: toggleKnownWord,
+    markKnown: markKnownWord,
     clear: clearKnownWords,
   }
 }

@@ -6,15 +6,11 @@ import {
   getChapterWordCount,
   QuranApiError,
 } from "@/lib/quran-api"
+import { parsePositiveInt } from "@/lib/utils"
 
 interface SurahPageProps {
   params: Promise<{ id: string }>
   searchParams: Promise<{ page?: string }>
-}
-
-function parsePositiveInt(value: string | undefined, fallback: number) {
-  const parsed = Number.parseInt(value ?? "", 10)
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback
 }
 
 export default async function SurahPage({
