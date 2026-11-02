@@ -28,7 +28,16 @@ export default async function SurahQuizPage({
 
   return (
     <>
-      <AppHeader />
+      <AppHeader
+        breadcrumbs={[
+          { label: "Daftar Surah", href: "/" },
+          {
+            label: data.chapter.nameSimple,
+            href: `/surah/${chapterId}?page=${data.pagination.currentPage}`,
+          },
+          { label: "Kuis", active: true },
+        ]}
+      />
       <QuizMode
         chapter={data.chapter}
         key={`${chapterId}-${data.pagination.currentPage}`}

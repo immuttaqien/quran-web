@@ -1,6 +1,6 @@
 "use client"
 
-import { BellIcon, CheckIcon, ChevronDownIcon } from "lucide-react"
+import { CheckIcon, ChevronDownIcon } from "lucide-react"
 import Link from "next/link"
 import { Fragment, useId } from "react"
 
@@ -15,7 +15,6 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import ThemeToggle from "../common/theme-toggle"
-import { Button } from "../ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,7 +41,7 @@ export default function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     <header className="sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
       <SidebarTrigger className="-ml-1" />
       <Separator className="!h-4 mr-2" orientation="vertical" />
-      <Breadcrumb className="flex-1 shrink-0 basis-[calc(100%-350px)]">
+      <Breadcrumb className="min-w-0 flex-1">
         <BreadcrumbList className="flex-nowrap truncate">
           {breadcrumbs.map((crumb, index) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: only for static breadcrumbs
@@ -97,18 +96,8 @@ export default function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
           ))}
         </BreadcrumbList>
       </Breadcrumb>
-      <div className="ml-4 flex w-[300px] items-center justify-end gap-2">
+      <div className="ml-4 flex items-center justify-end gap-2">
         <ThemeToggle />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size="icon" variant="ghost">
-              <BellIcon className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem>Tidak ada notifikasi baru</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </header>
   )

@@ -4,7 +4,7 @@ import ReviewMode from "@/components/review-mode"
 export default function ReviewPage() {
   return (
     <>
-      <AppHeader />
+      <AppHeader breadcrumbs={[{ label: "Ulasan", active: true }]} />
       <ReviewMode />
     </>
   )

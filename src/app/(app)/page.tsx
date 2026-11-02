@@ -12,7 +12,7 @@ export default async function Home() {
 
   return (
     <>
-      <AppHeader />
+      <AppHeader breadcrumbs={[{ label: "Daftar Surah", active: true }]} />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="max-w-5xl mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold text-slate-900 font-sans mb-1">

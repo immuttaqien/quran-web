@@ -87,7 +87,7 @@ test.describe("membaca surah", () => {
     await page.goto("/surah/1")
     await markFirstWords(page, 3)
 
-    await page.getByRole("link", { name: /Daftar Surah/ }).click()
+    await page.getByRole("link", { name: /← Daftar Surah/ }).click()
 
     await expect(page.getByText("3 kata dikenal").first()).toBeVisible()
     await expect(

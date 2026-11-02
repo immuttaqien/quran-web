@@ -147,7 +147,7 @@ test.describe("audio per kata", () => {
     await audioButtons(page).nth(0).click()
     await expect(pressed(page)).toHaveCount(1)
 
-    await page.getByRole("link", { name: /Daftar Surah/ }).click()
+    await page.getByRole("link", { name: /← Daftar Surah/ }).click()
 
     await expect(page).toHaveURL(/\/$/)
     expect(await playingCount(page)).toBe(0)

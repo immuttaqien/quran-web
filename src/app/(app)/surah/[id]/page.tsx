@@ -34,7 +34,12 @@ export default async function SurahPage({
 
   return (
     <>
-      <AppHeader />
+      <AppHeader
+        breadcrumbs={[
+          { label: "Daftar Surah", href: "/" },
+          { label: data.chapter.nameSimple, active: true },
+        ]}
+      />
       <SurahReader
         key={`${chapterId}-${data.pagination.currentPage}`}
         {...data}
