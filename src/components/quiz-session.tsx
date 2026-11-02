@@ -2,6 +2,9 @@
 
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import WordAudioButton from "@/components/word-audio-button"
+import useWordAudio from "@/hooks/use-word-audio"
+import { wordKey } from "@/lib/known-words-store"
 import { buildQuestions, type QuizQuestion } from "@/lib/quiz"
 import type { QuranWord } from "@/lib/quran-api"
 
@@ -36,6 +39,7 @@ export default function QuizSession({
   allowRestart = true,
   resultFooter,
 }: QuizSessionProps) {
+  const audio = useWordAudio()
   // Soal diacak, jadi baru dibuat di klien setelah mount agar tidak beda dengan HTML server.
   const [questions, setQuestions] = useState<QuizQuestion[] | null>(null)
   const [index, setIndex] = useState(0)
@@ -130,6 +134,7 @@ export default function QuizSession({
   }
 
   const question = questions[index]
+  const currentKey = wordKey(question.word.verseKey, question.word.position)
   const answered = selected !== null
 
   const choose = (option: string) => {
@@ -167,9 +172,16 @@ export default function QuizSession({
         dir="rtl">
         {question.word.arabic}
       </p>
-      <p className="mb-6 mt-3 text-center text-sm text-slate-500">
-        Apa arti kata ini?
-      </p>
+      <div className="mb-6 mt-3 flex items-center justify-center gap-2">
+        <WordAudioButton
+          failed={audio.failedKey === currentKey}
+          onClick={() =>
+            audio.toggle(question.word.verseKey, question.word.position)
+          }
+          playing={audio.playingKey === currentKey}
+        />
+        <span className="text-sm text-slate-500">Apa arti kata ini?</span>
+      </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         {question.options.map((option) => {

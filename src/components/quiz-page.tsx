@@ -1,6 +1,7 @@
 "use client"
 
 import useKnownWords from "@/hooks/use-known-words"
+import useWordAudio from "@/hooks/use-word-audio"
 import { wordKey } from "@/lib/known-words-store"
 import type { QuranWord } from "@/lib/quran-api"
 import { scheduleWord, unscheduleWord } from "@/lib/review-store"
@@ -13,6 +14,7 @@ interface QuizPageProps {
 
 export default function QuizPage({ words, showTranslations }: QuizPageProps) {
   const { knownWords, toggle } = useKnownWords()
+  const audio = useWordAudio()
 
   const keyOf = (word: QuranWord) => wordKey(word.verseKey, word.position)
   const onToggle = (word: QuranWord) => {
@@ -41,9 +43,12 @@ export default function QuizPage({ words, showTranslations }: QuizPageProps) {
         dir="rtl">
         {words.map((word) => (
           <WordCard
+            audioFailed={audio.failedKey === keyOf(word)}
+            audioPlaying={audio.playingKey === keyOf(word)}
             hidden={!showTranslations && knownWords.has(keyOf(word))}
             isKnown={knownWords.has(keyOf(word))}
             key={word.id}
+            onPlayAudio={() => audio.toggle(word.verseKey, word.position)}
             onToggle={() => onToggle(word)}
             showTranslation={showTranslations}
             word={word}
