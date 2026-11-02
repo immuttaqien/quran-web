@@ -235,3 +235,12 @@ export function parseIntOrDefault(n: string | undefined, def: number): number {
   if (Number.isNaN(parsed)) return def
   return parsed
 }
+
+/** Parse bilangan bulat > 0; selain itu kembalikan nilai default. */
+export function parsePositiveInt(
+  value: string | undefined,
+  fallback: number
+): number {
+  const parsed = Number.parseInt(value ?? "", 10)
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback
+}

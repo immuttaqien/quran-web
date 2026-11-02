@@ -85,7 +85,49 @@ docker run -p 3000:3000 quran-web
 | `bun build` | Build untuk production |
 | `bun start` | Jalankan production server |
 | `bun lint` | Lint kode dengan Biome |
+| `bun run biome:check` | Lint + cek format dengan Biome (dipakai CI) |
+| `bun run typecheck` | Cek tipe TypeScript |
+| `bun run test` | Uji unit (`bun:test`, di `src/**/*.test.ts`) |
+| `bun run build:e2e` | Build production untuk uji end-to-end |
+| `bun run test:e2e` | Uji end-to-end (Playwright, di `e2e/`) |
 | `bun clean` | Hapus build artifacts |
+
+## Pengujian
+
+**Uji unit** mencakup logika murni dan penyimpanan lokal (penjadwalan ulasan,
+kuis, cadangan progres, klien API). Berjalan tanpa browser dan tanpa jaringan:
+
+```bash
+bun run test
+```
+
+**Uji end-to-end** menjalankan aplikasi hasil build production di Chromium.
+Server dijalankan dengan Quran.com API tiruan (`e2e/mock-quran-api.cjs`), jadi
+hasilnya tidak bergantung pada jaringan atau ketersediaan `api.quran.com`.
+Siapkan `.env.local` (lihat bagian Instalasi) lalu:
+
+```bash
+bunx playwright install chromium   # sekali saja
+bun run build:e2e
+bun run test:e2e
+```
+
+Data tiruan didefinisikan di `e2e/mock-data.cjs`. Jika memakai ulang `.next`
+setelah mengubah data tiruan, jalankan `bun clean` dulu agar cache lama tidak
+terpakai.
+
+> Uji ini **tidak** memeriksa bentuk respons asli Quran.com API maupun URL audio
+> di CDN-nya. Setelah mengubah `src/lib/quran-api.ts` atau
+> `src/lib/word-audio.ts`, cek manual dengan `bun dev`.
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) berjalan pada push ke `main` dan
+setiap pull request:
+
+- **quality**: `biome check`, typecheck, dan uji unit.
+- **e2e**: build production lalu uji end-to-end; laporan Playwright diunggah
+  sebagai artifact.
 
 ## Lisensi
 

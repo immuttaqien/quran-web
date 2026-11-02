@@ -1,51 +1,57 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import useKnownWords from "@/hooks/use-known-words"
+import useWordAudio from "@/hooks/use-word-audio"
+import { wordKey } from "@/lib/known-words-store"
+import type { QuranWord } from "@/lib/quran-api"
+import { scheduleWord, unscheduleWord } from "@/lib/review-store"
 import WordCard from "./word-card"
-import type { QuranPage } from "@/lib/quran-data"
 
 interface QuizPageProps {
-  page: QuranPage
+  words: QuranWord[]
   showTranslations: boolean
 }
 
-export default function QuizPage({ page, showTranslations }: QuizPageProps) {
-  const [knownWords, setKnownWords] = useState<Set<number>>(new Set())
-  const [mounted, setMounted] = useState(false)
+export default function QuizPage({ words, showTranslations }: QuizPageProps) {
+  const { knownWords, toggle } = useKnownWords()
+  const audio = useWordAudio()
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const keyOf = (word: QuranWord) => wordKey(word.verseKey, word.position)
+  const onToggle = (word: QuranWord) => {
+    const key = keyOf(word)
+    const wasKnown = knownWords.has(key)
 
-  const toggleWordKnown = (index: number) => {
-    const newKnown = new Set(knownWords)
-    if (newKnown.has(index)) {
-      newKnown.delete(index)
+    toggle(key)
+
+    // Kata yang baru ditandai dikenal masuk jadwal ulasan; bila dibatalkan, keluar.
+    if (wasKnown) {
+      unscheduleWord(key)
     } else {
-      newKnown.add(index)
+      scheduleWord(word)
     }
-    setKnownWords(newKnown)
   }
 
-  if (!mounted) return null
-
-  const displayWords = page.words.filter((_, index) => {
-    if (showTranslations) return true
-    return !knownWords.has(index)
-  })
+  const knownOnPage = words.filter((word) => knownWords.has(keyOf(word))).length
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-8 border border-slate-100">
-      <div className="flex flex-wrap flex-row-reverse gap-6 justify-center items-start">
-        {page.words.map((word, index) => (
+      <p className="text-sm text-slate-500 mb-6">
+        {knownOnPage} dari {words.length} kata di halaman ini sudah dikenal
+      </p>
+      <div
+        className="flex flex-wrap gap-6 justify-center items-start"
+        dir="rtl">
+        {words.map((word) => (
           <WordCard
-            key={index}
-            word={word}
-            index={index}
-            isKnown={knownWords.has(index)}
-            onToggle={() => toggleWordKnown(index)}
+            audioFailed={audio.failedKey === keyOf(word)}
+            audioPlaying={audio.playingKey === keyOf(word)}
+            hidden={!showTranslations && knownWords.has(keyOf(word))}
+            isKnown={knownWords.has(keyOf(word))}
+            key={word.id}
+            onPlayAudio={() => audio.toggle(word.verseKey, word.position)}
+            onToggle={() => onToggle(word)}
             showTranslation={showTranslations}
-            hidden={!showTranslations && knownWords.has(index)}
+            word={word}
           />
         ))}
       </div>
