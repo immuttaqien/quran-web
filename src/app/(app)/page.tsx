@@ -4,6 +4,7 @@ import {
   TotalKnownWords,
 } from "@/components/known-words-summary"
 import AppHeader from "@/components/layout/app-header"
+import ReviewBanner from "@/components/review-banner"
 import { getChapters } from "@/lib/quran-api"
 
 export default async function Home() {
@@ -21,6 +22,8 @@ export default async function Home() {
             {chapters.length} surah · <TotalKnownWords /> · pilih satu untuk
             mulai belajar
           </p>
+
+          <ReviewBanner />
 
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {chapters.map((chapter) => (

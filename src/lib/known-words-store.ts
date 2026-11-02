@@ -10,13 +10,16 @@
  * Versi 1 menyimpan ID kata tanpa informasi surah, sehingga tidak dimigrasikan.
  */
 
+import { createLocalStore } from "@/lib/local-store"
+
 export const STORAGE_KEY = "quran-web:known-words:v2"
-export const CHANGE_EVENT = "quran-web:known-words-change"
 export const EMPTY_SNAPSHOT = "[]"
 
 const WORD_KEY_PATTERN = /^\d+:\d+:\d+$/
 
-let memorySnapshot = EMPTY_SNAPSHOT
+const store = createLocalStore(STORAGE_KEY, EMPTY_SNAPSHOT)
+
+export const { getSnapshot, getServerSnapshot, subscribe } = store
 
 export function wordKey(verseKey: string, position: number): string {
   return `${verseKey}:${position}`
@@ -51,41 +54,6 @@ export function countByChapter(keys: Iterable<string>): Map<number, number> {
   return counts
 }
 
-export function getSnapshot(): string {
-  try {
-    return window.localStorage.getItem(STORAGE_KEY) ?? EMPTY_SNAPSHOT
-  } catch {
-    return memorySnapshot
-  }
-}
-
-export function getServerSnapshot(): string {
-  return EMPTY_SNAPSHOT
-}
-
-export function subscribe(onChange: () => void): () => void {
-  window.addEventListener("storage", onChange)
-  window.addEventListener(CHANGE_EVENT, onChange)
-
-  return () => {
-    window.removeEventListener("storage", onChange)
-    window.removeEventListener(CHANGE_EVENT, onChange)
-  }
-}
-
-function write(keys: string[]) {
-  const raw = JSON.stringify(keys)
-  memorySnapshot = raw
-
-  try {
-    window.localStorage.setItem(STORAGE_KEY, raw)
-  } catch {
-    // Penyimpanan penuh atau diblokir: pakai memori saja.
-  }
-
-  window.dispatchEvent(new Event(CHANGE_EVENT))
-}
-
 /** Tandai atau batalkan tanda sebuah kata. Selalu membaca nilai terbaru dari storage. */
 export function toggleKnownWord(key: string) {
   const keys = new Set(parseKnownKeys(getSnapshot()))
@@ -96,7 +64,7 @@ export function toggleKnownWord(key: string) {
     keys.add(key)
   }
 
-  write([...keys])
+  store.write(JSON.stringify([...keys]))
 }
 
 /** Tandai sebuah kata sebagai dikenal (tidak membatalkan bila sudah ditandai). */
@@ -105,9 +73,9 @@ export function markKnownWord(key: string) {
   if (keys.has(key)) return
 
   keys.add(key)
-  write([...keys])
+  store.write(JSON.stringify([...keys]))
 }
 
 export function clearKnownWords() {
-  write([])
+  store.write(EMPTY_SNAPSHOT)
 }
