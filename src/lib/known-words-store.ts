@@ -29,14 +29,23 @@ export function chapterOfKey(key: string): number {
   return Number.parseInt(key.split(":")[0], 10)
 }
 
+/** Ambil hanya kunci kata yang valid dari nilai tak tepercaya; duplikat dibuang. */
+export function sanitizeKnownKeys(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+
+  return [
+    ...new Set(
+      value.filter(
+        (key): key is string =>
+          typeof key === "string" && WORD_KEY_PATTERN.test(key)
+      )
+    ),
+  ]
+}
+
 export function parseKnownKeys(raw: string): string[] {
   try {
-    const value: unknown = JSON.parse(raw)
-    if (!Array.isArray(value)) return []
-    return value.filter(
-      (key): key is string =>
-        typeof key === "string" && WORD_KEY_PATTERN.test(key)
-    )
+    return sanitizeKnownKeys(JSON.parse(raw))
   } catch {
     return []
   }
@@ -74,6 +83,11 @@ export function markKnownWord(key: string) {
 
   keys.add(key)
   store.write(JSON.stringify([...keys]))
+}
+
+/** Ganti seluruh daftar kata dikenal (mis. saat impor). */
+export function setKnownWords(keys: Iterable<string>) {
+  store.write(JSON.stringify(sanitizeKnownKeys([...keys])))
 }
 
 export function clearKnownWords() {

@@ -20,7 +20,10 @@ export default async function Home() {
           </h1>
           <p className="text-slate-500 text-sm mb-8">
             {chapters.length} surah · <TotalKnownWords /> · pilih satu untuk
-            mulai belajar
+            mulai belajar ·{" "}
+            <Link className="text-teal-600 hover:underline" href="/progress">
+              Kelola data progres
+            </Link>
           </p>
 
           <ReviewBanner />

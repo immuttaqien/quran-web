@@ -14,6 +14,7 @@ export const REVIEW_STORAGE_KEY = "quran-web:review:v1"
 export const EMPTY_REVIEWS = "{}"
 
 const WORD_KEY_PATTERN = /^\d+:\d+:\d+$/
+const MAX_TEXT_LENGTH = 200
 
 export interface ReviewCard {
   key: string
@@ -49,7 +50,9 @@ function isReviewCard(key: string, value: unknown): value is ReviewCard {
     typeof card.verseKey === "string" &&
     Number.isInteger(card.position) &&
     typeof card.arabic === "string" &&
+    card.arabic.length <= MAX_TEXT_LENGTH &&
     typeof card.translation === "string" &&
+    card.translation.length <= MAX_TEXT_LENGTH &&
     Number.isInteger(card.box) &&
     (card.box as number) >= 0 &&
     (card.box as number) <= MAX_BOX &&
@@ -58,17 +61,20 @@ function isReviewCard(key: string, value: unknown): value is ReviewCard {
   )
 }
 
-/** Baca snapshot; entri yang rusak dibuang, bukan membuat seluruh data gagal. */
+/** Ambil hanya entri yang valid dari nilai tak tepercaya, bukan menggagalkan seluruhnya. */
+export function sanitizeReviews(value: unknown): ReviewMap {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return {}
+  }
+
+  return Object.fromEntries(
+    Object.entries(value).filter(([key, card]) => isReviewCard(key, card))
+  ) as ReviewMap
+}
+
 export function parseReviews(raw: string): ReviewMap {
   try {
-    const value: unknown = JSON.parse(raw)
-    if (typeof value !== "object" || value === null || Array.isArray(value)) {
-      return {}
-    }
-
-    return Object.fromEntries(
-      Object.entries(value).filter(([key, card]) => isReviewCard(key, card))
-    ) as ReviewMap
+    return sanitizeReviews(JSON.parse(raw))
   } catch {
     return {}
   }
@@ -127,6 +133,15 @@ export function unscheduleWord(key: string) {
 
   delete map[key]
   writeAll(map)
+}
+
+/** Ganti seluruh jadwal ulasan (mis. saat impor). */
+export function setReviews(map: ReviewMap) {
+  writeAll(sanitizeReviews(map))
+}
+
+export function clearReviews() {
+  store.write(EMPTY_REVIEWS)
 }
 
 export function reviewCardToWord(card: ReviewCard): QuranWord {
