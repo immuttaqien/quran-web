@@ -1,3 +1,5 @@
+import { unstable_cache } from "next/cache"
+
 /**
  * Client untuk Quran.com API v4 (https://api-docs.quran.foundation).
  * Dipanggil dari Server Component, respons di-cache oleh Next.js.
@@ -22,6 +24,7 @@ export interface Chapter {
 export interface QuranWord {
   id: number
   verseKey: string
+  position: number
   arabic: string
   transliteration?: string
   translation: string
@@ -153,6 +156,7 @@ export async function getChapterPage(
       .map((word) => ({
         id: word.id,
         verseKey: verse.verse_key,
+        position: word.position,
         arabic: word.text_uthmani ?? word.text ?? "",
         transliteration: word.transliteration?.text ?? undefined,
         translation: word.translation?.text ?? "",
@@ -168,3 +172,42 @@ export async function getChapterPage(
     },
   }
 }
+
+const MAX_PER_PAGE = 50
+
+async function fetchChapterWordCount(chapterId: number): Promise<number> {
+  const fetchPage = (page: number) =>
+    request<{ verses: ApiVerse[]; pagination: ApiPagination }>(
+      `/verses/by_chapter/${chapterId}`,
+      { words: true, per_page: MAX_PER_PAGE, page }
+    )
+
+  const countWords = (verses: ApiVerse[]) =>
+    verses.reduce(
+      (total, verse) =>
+        total + verse.words.filter((w) => w.char_type_name === "word").length,
+      0
+    )
+
+  const first = await fetchPage(1)
+  const remainingPages = Array.from(
+    { length: Math.max(0, first.pagination.total_pages - 1) },
+    (_, i) => i + 2
+  )
+  const rest = await Promise.all(remainingPages.map(fetchPage))
+
+  return rest.reduce(
+    (total, data) => total + countWords(data.verses),
+    countWords(first.verses)
+  )
+}
+
+/**
+ * Jumlah kata (tanpa penanda akhir ayat) dalam satu surah.
+ * Dihitung dari seluruh ayat, lalu hasilnya yang kecil di-cache 24 jam.
+ */
+export const getChapterWordCount = unstable_cache(
+  fetchChapterWordCount,
+  ["quran-chapter-word-count"],
+  { revalidate: REVALIDATE_SECONDS }
+)

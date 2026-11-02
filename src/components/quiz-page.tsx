@@ -1,6 +1,7 @@
 "use client"
 
 import useKnownWords from "@/hooks/use-known-words"
+import { wordKey } from "@/lib/known-words-store"
 import type { QuranWord } from "@/lib/quran-api"
 import WordCard from "./word-card"
 
@@ -12,7 +13,8 @@ interface QuizPageProps {
 export default function QuizPage({ words, showTranslations }: QuizPageProps) {
   const { knownWords, toggle } = useKnownWords()
 
-  const knownOnPage = words.filter((word) => knownWords.has(word.id)).length
+  const keyOf = (word: QuranWord) => wordKey(word.verseKey, word.position)
+  const knownOnPage = words.filter((word) => knownWords.has(keyOf(word))).length
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-8 border border-slate-100">
@@ -24,10 +26,10 @@ export default function QuizPage({ words, showTranslations }: QuizPageProps) {
         dir="rtl">
         {words.map((word) => (
           <WordCard
-            hidden={!showTranslations && knownWords.has(word.id)}
-            isKnown={knownWords.has(word.id)}
+            hidden={!showTranslations && knownWords.has(keyOf(word))}
+            isKnown={knownWords.has(keyOf(word))}
             key={word.id}
-            onToggle={() => toggle(word.id)}
+            onToggle={() => toggle(keyOf(word))}
             showTranslation={showTranslations}
             word={word}
           />

@@ -3,13 +3,19 @@
 import Link from "next/link"
 import { useState } from "react"
 import QuizPage from "@/components/quiz-page"
+import SurahStats from "@/components/surah-stats"
 import type { ChapterPage } from "@/lib/quran-api"
+
+interface SurahReaderProps extends ChapterPage {
+  totalWords: number | null
+}
 
 export default function SurahReader({
   chapter,
   words,
   pagination,
-}: ChapterPage) {
+  totalWords,
+}: SurahReaderProps) {
   const [showTranslations, setShowTranslations] = useState(false)
   const { currentPage, totalPages } = pagination
 
@@ -52,6 +58,8 @@ export default function SurahReader({
             />
           </div>
         </div>
+
+        <SurahStats chapterId={chapter.id} totalWords={totalWords} />
 
         <QuizPage showTranslations={showTranslations} words={words} />
 

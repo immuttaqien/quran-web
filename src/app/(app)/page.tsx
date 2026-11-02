@@ -1,4 +1,8 @@
 import Link from "next/link"
+import {
+  ChapterKnownWords,
+  TotalKnownWords,
+} from "@/components/known-words-summary"
 import AppHeader from "@/components/layout/app-header"
 import { getChapters } from "@/lib/quran-api"
 
@@ -14,7 +18,8 @@ export default async function Home() {
             Daftar Surah
           </h1>
           <p className="text-slate-500 text-sm mb-8">
-            {chapters.length} surah · pilih satu untuk mulai belajar
+            {chapters.length} surah · <TotalKnownWords /> · pilih satu untuk
+            mulai belajar
           </p>
 
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -32,6 +37,7 @@ export default async function Home() {
                     </span>
                     <span className="block text-xs text-slate-500 truncate">
                       {chapter.nameTranslated} · {chapter.versesCount} ayat
+                      <ChapterKnownWords chapterId={chapter.id} />
                     </span>
                   </span>
                   <span className="text-xl text-slate-900" dir="rtl">

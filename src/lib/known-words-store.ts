@@ -1,26 +1,54 @@
 /**
  * Penyimpanan progres kata yang sudah dikenal di localStorage.
  *
- * Disimpan sebagai string JSON (array id kata) agar bisa dipakai langsung
- * sebagai snapshot yang stabil oleh useSyncExternalStore. Bila localStorage
- * tidak tersedia (mode privat, diblokir), progres tetap tersimpan di memori
- * selama halaman terbuka.
+ * Setiap kata disimpan dengan kunci lokasi "surah:ayat:posisi" (mis. "2:255:3")
+ * sehingga progres bisa dihitung per surah. Seluruh daftar disimpan sebagai
+ * string JSON agar bisa dipakai langsung sebagai snapshot yang stabil oleh
+ * useSyncExternalStore. Bila localStorage tidak tersedia (mode privat,
+ * diblokir), progres tetap tersimpan di memori selama halaman terbuka.
+ *
+ * Versi 1 menyimpan ID kata tanpa informasi surah, sehingga tidak dimigrasikan.
  */
 
-export const STORAGE_KEY = "quran-web:known-words:v1"
+export const STORAGE_KEY = "quran-web:known-words:v2"
 export const CHANGE_EVENT = "quran-web:known-words-change"
 export const EMPTY_SNAPSHOT = "[]"
 
+const WORD_KEY_PATTERN = /^\d+:\d+:\d+$/
+
 let memorySnapshot = EMPTY_SNAPSHOT
 
-export function parseKnownIds(raw: string): number[] {
+export function wordKey(verseKey: string, position: number): string {
+  return `${verseKey}:${position}`
+}
+
+export function chapterOfKey(key: string): number {
+  return Number.parseInt(key.split(":")[0], 10)
+}
+
+export function parseKnownKeys(raw: string): string[] {
   try {
     const value: unknown = JSON.parse(raw)
     if (!Array.isArray(value)) return []
-    return value.filter((id): id is number => Number.isInteger(id))
+    return value.filter(
+      (key): key is string =>
+        typeof key === "string" && WORD_KEY_PATTERN.test(key)
+    )
   } catch {
     return []
   }
+}
+
+/** Jumlah kata yang dikenal per nomor surah. */
+export function countByChapter(keys: Iterable<string>): Map<number, number> {
+  const counts = new Map<number, number>()
+
+  for (const key of keys) {
+    const chapter = chapterOfKey(key)
+    counts.set(chapter, (counts.get(chapter) ?? 0) + 1)
+  }
+
+  return counts
 }
 
 export function getSnapshot(): string {
@@ -45,8 +73,8 @@ export function subscribe(onChange: () => void): () => void {
   }
 }
 
-function write(ids: number[]) {
-  const raw = JSON.stringify(ids)
+function write(keys: string[]) {
+  const raw = JSON.stringify(keys)
   memorySnapshot = raw
 
   try {
@@ -59,16 +87,16 @@ function write(ids: number[]) {
 }
 
 /** Tandai atau batalkan tanda sebuah kata. Selalu membaca nilai terbaru dari storage. */
-export function toggleKnownWord(id: number) {
-  const ids = new Set(parseKnownIds(getSnapshot()))
+export function toggleKnownWord(key: string) {
+  const keys = new Set(parseKnownKeys(getSnapshot()))
 
-  if (ids.has(id)) {
-    ids.delete(id)
+  if (keys.has(key)) {
+    keys.delete(key)
   } else {
-    ids.add(id)
+    keys.add(key)
   }
 
-  write([...ids])
+  write([...keys])
 }
 
 export function clearKnownWords() {
